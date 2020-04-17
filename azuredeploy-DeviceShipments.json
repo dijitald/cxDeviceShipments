@@ -1,34 +1,17 @@
 {
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
-    "parameters": {    
-        "appName": { 
-            "type": "string",
-            "defaultValue" : "xfDeviceShipments",
-            "metadata" : {
-                "description" : "Name needs to be globally unique NAME.azurewebsites.net"
-            }
-        },
-        "storageName": {
-            "type": "string",
-            "defaultValue" : "xfdeviceshipmentstorage",
-            "metadata" : {
-                "description" : "Name may only be lower case letters or numbers."
-            }            
-        },
-        "location": {
-            "type": "string"
-        },
-        "msdeployPackageUrl": {
-            "type": "string"
-        }
+    "parameters": {    },
+    "variables": {
+        "appName": "[concat('DeviceShipment', uniqueString(resourceGroup().id))]",
+        "storageName": "[toLower(concat('deviceshipmentstorage', uniqueString(resourceGroup().id) ) )]",
+        "eventgridTopic" : "[toLower(concat('topic-event-grid-', uniqueString(resourceGroup().id) ) )]"
     },
-    "variables": {},
     "resources": [
         {
             "type": "Microsoft.EventGrid/topics",
             "apiVersion": "2020-04-01-preview",
-            "name": "topic-device-shipments",
+            "name": "[variables('eventgridTopic')]",
             "location": "centralus",
             "sku": {
                 "name": "Basic"
@@ -41,7 +24,7 @@
         {
             "type": "Microsoft.Storage/storageAccounts",
             "apiVersion": "2019-06-01",
-            "name": "[parameters('storageName')]",
+            "name": "[variables('storageName')]",
             "location": "centralus",
             "sku": {
                 "name": "Standard_LRS",
@@ -100,9 +83,9 @@
         {
             "type": "Microsoft.Storage/storageAccounts/blobServices",
             "apiVersion": "2019-06-01",
-            "name": "[concat(parameters('storageName'),'/default')]",
+            "name": "[concat(variables('storageName'),'/default')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageName'))]"
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageName'))]"
             ],
             "sku": {
                 "name": "Standard_LRS",
@@ -120,9 +103,9 @@
         {
             "type": "Microsoft.Storage/storageAccounts/fileServices",
             "apiVersion": "2019-06-01",
-            "name": "[concat(parameters('storageName'),'/default')]",
+            "name": "[concat(variables('storageName'),'/default')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageName'))]"
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageName'))]"
             ],
             "sku": {
                 "name": "Standard_LRS",
@@ -137,7 +120,7 @@
         {
             "type": "Microsoft.Web/sites",
             "apiVersion": "2018-11-01",
-            "name": "[parameters('appName')]",
+            "name": "[variables('appName')]",
             "location": "Central US",
             "dependsOn": [
                 "[resourceId('Microsoft.Web/serverfarms', 'ASP-rgDeviceShipments-b67a')]"
@@ -147,12 +130,12 @@
                 "enabled": true,
                 "hostNameSslStates": [
                     {
-                        "name": "[concat(parameters('appName'),'.azurewebsites.net')]",
+                        "name": "[concat(variables('appName'),'.azurewebsites.net')]",
                         "sslState": "Disabled",
                         "hostType": "Standard"
                     },
                     {
-                        "name": "[concat(parameters('appName'),'.scm.azurewebsites.net')]",
+                        "name": "[concat(variables('appName'),'.scm.azurewebsites.net')]",
                         "sslState": "Disabled",
                         "hostType": "Repository"
                     }
@@ -174,10 +157,10 @@
         {
             "type": "Microsoft.Web/sites/config",
             "apiVersion": "2018-11-01",
-            "name": "[concat(parameters('appName'), '/web')]",
+            "name": "[concat(variables('appName'), '/web')]",
             "location": "Central US",
             "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', parameters('appName'))]"
+                "[resourceId('Microsoft.Web/sites', variables('appName'))]"
             ],
             "properties": {
                 "numberOfWorkers": -1,
@@ -199,7 +182,7 @@
                 "httpLoggingEnabled": false,
                 "logsDirectorySizeLimit": 35,
                 "detailedErrorLoggingEnabled": false,
-                "publishingUsername": "[concat('$', parameters('appName'))]",
+                "publishingUsername": "[concat('$', variables('appName'))]",
                 "scmType": "None",
                 "use32BitWorkerProcess": true,
                 "webSocketsEnabled": false,
@@ -254,55 +237,55 @@
         {
             "type": "Microsoft.Web/sites/functions",
             "apiVersion": "2018-11-01",
-            "name":  "[concat(parameters('appName'), '/Approved')]",
+            "name":  "[concat(variables('appName'), '/Approved')]",
             "location": "Central US",
             "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', parameters('appName'))]"
+                "[resourceId('Microsoft.Web/sites', variables('appName'))]"
             ],
             "properties": {
-                "script_root_path_href": "[concat('https://', parameters('appName'), '.azurewebsites.net/admin/vfs/site/wwwroot/Approved/')]",
-                "script_href": "[concat('https://', parameters('appName'), '.azurewebsites.net/admin/vfs/site/wwwroot/bin/DeviceShipments.dll')]",
-                "config_href": "[concat('https://', parameters('appName'), '.azurewebsites.net/admin/vfs/site/wwwroot/Approved/function.json')]",
-                "href": "[concat('https://', parameters('appName'), '.azurewebsites.net/admin/functions/Approved')]",
+                "script_root_path_href": "[concat('https://', variables('appName'), '.azurewebsites.net/admin/vfs/site/wwwroot/Approved/')]",
+                "script_href": "[concat('https://', variables('appName'), '.azurewebsites.net/admin/vfs/site/wwwroot/bin/DeviceShipments.dll')]",
+                "config_href": "[concat('https://', variables('appName'), '.azurewebsites.net/admin/vfs/site/wwwroot/Approved/function.json')]",
+                "href": "[concat('https://', variables('appName'), '.azurewebsites.net/admin/functions/Approved')]",
                 "config": {}
             }
         },
         {
             "type": "Microsoft.Web/sites/functions",
             "apiVersion": "2018-11-01",
-            "name": "[concat(parameters('appName'), '/NewFile')]",
+            "name": "[concat(variables('appName'), '/NewFile')]",
             "location": "Central US",
             "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', parameters('appName'))]"
+                "[resourceId('Microsoft.Web/sites', variables('appName'))]"
             ],
             "properties": {
-                "script_root_path_href": "[concat('https://', parameters('appName'), '.azurewebsites.net/admin/vfs/site/wwwroot/NewFile/')]",
-                "script_href": "[concat('https://', parameters('appName'), '.azurewebsites.net/admin/vfs/site/wwwroot/bin/DeviceShipments.dll')]",
-                "config_href": "[concat('https://', parameters('appName'), '.azurewebsites.net/admin/vfs/site/wwwroot/NewFile/function.json')]",
-                "href": "[concat('https://', parameters('appName'), '.azurewebsites.net/admin/functions/NewFile')]",
+                "script_root_path_href": "[concat('https://', variables('appName'), '.azurewebsites.net/admin/vfs/site/wwwroot/NewFile/')]",
+                "script_href": "[concat('https://', variables('appName'), '.azurewebsites.net/admin/vfs/site/wwwroot/bin/DeviceShipments.dll')]",
+                "config_href": "[concat('https://', variables('appName'), '.azurewebsites.net/admin/vfs/site/wwwroot/NewFile/function.json')]",
+                "href": "[concat('https://', variables('appName'), '.azurewebsites.net/admin/functions/NewFile')]",
                 "config": {}
             }
         },
         {
             "type": "Microsoft.Web/sites/hostNameBindings",
             "apiVersion": "2018-11-01",
-            "name": "[concat(parameters('appName'), '/', toLower(parameters('appName')), '.azurewebsites.net')]",
+            "name": "[concat(variables('appName'), '/', toLower(variables('appName')), '.azurewebsites.net')]",
             "location": "Central US",
             "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', parameters('appName'))]"
+                "[resourceId('Microsoft.Web/sites', variables('appName'))]"
             ],
             "properties": {
-                "siteName": "[parameters('appName')]",
+                "siteName": "[variables('appName')]",
                 "hostNameType": "Verified"
             }
         },
         {
             "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
             "apiVersion": "2019-06-01",
-            "name": "[concat(parameters('storageName'), '/default/azure-webjobs-hosts')]",
+            "name": "[concat(variables('storageName'), '/default/azure-webjobs-hosts')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageName'), 'default')]",
-                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageName'))]"
+                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', variables('storageName'), 'default')]",
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageName'))]"
             ],
             "properties": {
                 "publicAccess": "None"
@@ -311,10 +294,10 @@
         {
             "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
             "apiVersion": "2019-06-01",
-            "name": "[concat(parameters('storageName'), '/default/azure-webjobs-secrets')]",
+            "name": "[concat(variables('storageName'), '/default/azure-webjobs-secrets')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageName'), 'default')]",
-                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageName'))]"
+                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', variables('storageName'), 'default')]",
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageName'))]"
             ],
             "properties": {
                 "publicAccess": "None"
@@ -323,10 +306,10 @@
         {
             "type": "Microsoft.Storage/storageAccounts/fileServices/shares",
             "apiVersion": "2019-06-01",
-            "name": "[concat(parameters('storageName'), '/default/device-shipment-files')]",
+            "name": "[concat(variables('storageName'), '/default/device-shipment-files')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Storage/storageAccounts/fileServices', parameters('storageName'), 'default')]",
-                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageName'))]"
+                "[resourceId('Microsoft.Storage/storageAccounts/fileServices', variables('storageName'), 'default')]",
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageName'))]"
             ],
             "properties": {
                 "shareQuota": 5120
@@ -335,10 +318,10 @@
         {
             "type": "Microsoft.Storage/storageAccounts/fileServices/shares",
             "apiVersion": "2019-06-01",
-            "name": "[concat(parameters('storageName'), '/default/deviceshipmentsa9b6')]",
+            "name": "[concat(variables('storageName'), '/default/deviceshipmentsa9b6')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Storage/storageAccounts/fileServices', parameters('storageName'), 'default')]",
-                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageName'))]"
+                "[resourceId('Microsoft.Storage/storageAccounts/fileServices', variables('storageName'), 'default')]",
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageName'))]"
             ],
             "properties": {
                 "shareQuota": 5120
@@ -639,7 +622,7 @@
             "name": "logic-device-shipments-eventgrid",
             "location": "centralus",
             "dependsOn": [
-"[resourceId('Microsoft.EventGrid/topics', 'topic-device-shipments')]",
+"[resourceId('Microsoft.EventGrid/topics', variables('eventgridTopic'))]",
 "[resourceId('Microsoft.Web/connections', 'azureeventgrid')]",
 "[resourceId('Microsoft.Web/connections', 'sharepointonline')]"
             ],
@@ -671,7 +654,7 @@
                                                 "endpointUrl": "@{listCallbackUrl()}"
                                             }
                                         },
-                                        "topic": "[resourceId('Microsoft.EventGrid/topics', 'topic-device-shipments')]"
+                                        "topic": "[resourceId('Microsoft.EventGrid/topics', variables('eventgridTopic'))]"
                                     }
                                 },
                                 "host": {
