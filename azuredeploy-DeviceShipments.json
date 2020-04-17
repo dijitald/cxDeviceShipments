@@ -11,7 +11,7 @@
         },
         "storageName": {
             "type": "string",
-            "defaultValue" : "xfdeviceshipmentstorage2",
+            "defaultValue" : "xfdeviceshipmentstorage",
             "metadata" : {
                 "description" : "Name may only be lower case letters or numbers."
             }            
@@ -174,7 +174,7 @@
         {
             "type": "Microsoft.Web/sites/config",
             "apiVersion": "2018-11-01",
-            "name": "DeviceShipments/web",
+            "name": "[concat(parameters('appName'), '/web')]",
             "location": "Central US",
             "dependsOn": [
                 "[resourceId('Microsoft.Web/sites', parameters('appName'))]"
@@ -270,10 +270,10 @@
         {
             "type": "Microsoft.Web/sites/functions",
             "apiVersion": "2018-11-01",
-            "name": "DeviceShipments/NewFile",
+            "name": "[concat(parameters('appName'), '/NewFile')]",
             "location": "Central US",
             "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', 'DeviceShipments')]"
+                "[resourceId('Microsoft.Web/sites', parameters('appName'))]"
             ],
             "properties": {
                 "script_root_path_href": "[concat('https://', parameters('appName'), '.azurewebsites.net/admin/vfs/site/wwwroot/NewFile/')]",
@@ -292,7 +292,7 @@
                 "[resourceId('Microsoft.Web/sites', parameters('appName'))]"
             ],
             "properties": {
-                "siteName": "DeviceShipments",
+                "siteName": "[parameters('appName')]",
                 "hostNameType": "Verified"
             }
         },
