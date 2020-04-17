@@ -4,7 +4,7 @@
     "parameters": {    },
     "variables": {
         "appName": "[concat('DeviceShipment', uniqueString(resourceGroup().id))]",
-        "storageName": "[toLower(concat('deviceshipmentstorage', uniqueString(resourceGroup().id) ) )]",
+        "storageName": "[toLower(concat('xfstorage', uniqueString(resourceGroup().id) ) )]",
         "eventgridTopic" : "[toLower(concat('topic-event-grid-', uniqueString(resourceGroup().id) ) )]"
     },
     "resources": [
