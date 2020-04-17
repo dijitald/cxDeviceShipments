@@ -1,0 +1,86 @@
+{
+    "type": "Microsoft.Web/connections",
+    "apiVersion": "2016-06-01",
+    "name": "azureeventgrid",
+    "location": "centralus",
+    "properties": {
+        "displayName": "ddials@microsoft.com",
+        "customParameterValues": {},
+        "api": {
+            "id": "/subscriptions/7bc9da69-3220-4f6a-8cfd-f05fc5a64aa9/providers/Microsoft.Web/locations/centralus/managedApis/azureeventgrid"
+        }
+    }
+},
+{
+    "type": "Microsoft.Web/connections",
+    "apiVersion": "2016-06-01",
+    "name": "azureeventgridpublish",
+    "location": "centralus",
+    "properties": {
+        "displayName": "EventGridPublish",
+        "customParameterValues": {},
+        "api": {
+            "id": "/subscriptions/7bc9da69-3220-4f6a-8cfd-f05fc5a64aa9/providers/Microsoft.Web/locations/centralus/managedApis/azureeventgridpublish"
+        }
+    }
+},
+{
+    "type": "Microsoft.Web/connections",
+    "apiVersion": "2016-06-01",
+    "name": "azurefile",
+    "location": "centralus",
+    "properties": {
+        "displayName": "AzureFileStore",
+        "customParameterValues": {},
+        "api": {
+            "id": "/subscriptions/7bc9da69-3220-4f6a-8cfd-f05fc5a64aa9/providers/Microsoft.Web/locations/centralus/managedApis/azurefile"
+        }
+    }
+},
+{
+    "type": "Microsoft.Web/connections",
+    "apiVersion": "2016-06-01",
+    "name": "sharepointonline",
+    "location": "centralus",
+    "properties": {
+        "displayName": "ddials@microsoft.com",
+        "customParameterValues": {},
+        "api": {
+            "id": "/subscriptions/7bc9da69-3220-4f6a-8cfd-f05fc5a64aa9/providers/Microsoft.Web/locations/centralus/managedApis/sharepointonline"
+        }
+    }
+},
+
+
+
+"host": {
+    "connection": {
+        "name": "@parameters('$connections')['azurefile_1']['connectionId']"
+    }
+},
+
+
+"[resourceId('Microsoft.Web/connections', 'azureeventgridpublish')]",
+"[resourceId('Microsoft.Web/connections', 'azurefile')]",
+"[resourceId('Microsoft.Web/connections', 'sharepointonline')]"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
