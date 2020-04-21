@@ -6,7 +6,7 @@
         "appName": "[concat('DeviceShipment', uniqueString(resourceGroup().id))]",
         "storageName": "[toLower(concat('xfstorage', uniqueString(resourceGroup().id) ) )]",
         "eventgridTopic" : "[toLower(concat('topic-event-grid-', uniqueString(resourceGroup().id) ) )]",
-        "serverFarmName" : "[concat('ASP-', resourceGroup().name, '-', resourceGroup().id)]"
+        "serverFarmName" : "[concat('ASP-', resourceGroup().name, '-', uniqueString(resourceGroup().id))]"
     },
     "resources": [
         {
