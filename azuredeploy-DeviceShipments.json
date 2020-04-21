@@ -612,17 +612,17 @@
                             "azureeventgridpublish": {
                                 "connectionId": "[resourceId('Microsoft.Web/connections', 'azureeventgridpublish')]",
                                 "connectionName": "azureeventgridpublish",
-                                "id": "[concat('/subscriptions/', subscription().id, '/providers/Microsoft.Web/locations/centralus/managedApis/azureeventgridpublish')]"
+                                "id": "[concat(subscription().id, '/providers/Microsoft.Web/locations/centralus/managedApis/azureeventgridpublish')]"
                             },
                             "azurefile": {
                                 "connectionId": "[resourceId('Microsoft.Web/connections', 'azurefile')]",
                                 "connectionName": "azurefile",
-                                "id": "[concat('/subscriptions/', subscription().id, '/providers/Microsoft.Web/locations/centralus/managedApis/azurefile')]"
+                                "id": "[concat(subscription().id, '/providers/Microsoft.Web/locations/centralus/managedApis/azurefile')]"
                             },
                             "sharepointonline": {
                                 "connectionId": "[resourceId('Microsoft.Web/connections', 'sharepointonline')]",
                                 "connectionName": "sharepointonline",
-                                "id": "[concat('/subscriptions/', subscription().id, '/providers/Microsoft.Web/locations/centralus/managedApis/sharepointonline')]"
+                                "id": "[concat(subscription().id, '/providers/Microsoft.Web/locations/centralus/managedApis/sharepointonline')]"
                             }
                         }
                     }
