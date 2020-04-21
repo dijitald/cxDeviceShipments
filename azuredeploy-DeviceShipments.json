@@ -5,7 +5,8 @@
     "variables": {
         "appName": "[concat('DeviceShipment', uniqueString(resourceGroup().id))]",
         "storageName": "[toLower(concat('xfstorage', uniqueString(resourceGroup().id) ) )]",
-        "eventgridTopic" : "[toLower(concat('topic-event-grid-', uniqueString(resourceGroup().id) ) )]"
+        "eventgridTopic" : "[toLower(concat('topic-event-grid-', uniqueString(resourceGroup().id) ) )]",
+        "serverFarmName" : "[concat('ASP-', resourceGroup().name, '-', resourceGroup().id)]"
     },
     "resources": [
         {
@@ -56,30 +57,7 @@
                 "accessTier": "Hot"
             }
         },
-        {
-            "type": "Microsoft.Web/serverfarms",
-            "apiVersion": "2018-02-01",
-            "name": "ASP-rgDeviceShipments-b67a",
-            "location": "Central US",
-            "sku": {
-                "name": "Y1",
-                "tier": "Dynamic",
-                "size": "Y1",
-                "family": "Y",
-                "capacity": 0
-            },
-            "kind": "functionapp",
-            "properties": {
-                "perSiteScaling": false,
-                "maximumElasticWorkerCount": 1,
-                "isSpot": false,
-                "reserved": false,
-                "isXenon": false,
-                "hyperV": false,
-                "targetWorkerCount": 0,
-                "targetWorkerSizeId": 0
-            }
-        },
+       
         {
             "type": "Microsoft.Storage/storageAccounts/blobServices",
             "apiVersion": "2019-06-01",
@@ -116,6 +94,78 @@
                     "corsRules": []
                 }
             }
+        }, 
+        {
+            "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+            "apiVersion": "2019-06-01",
+            "name": "[concat(variables('storageName'), '/default/azure-webjobs-hosts')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', variables('storageName'), 'default')]",
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageName'))]"
+            ],
+            "properties": {
+                "publicAccess": "None"
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+            "apiVersion": "2019-06-01",
+            "name": "[concat(variables('storageName'), '/default/azure-webjobs-secrets')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', variables('storageName'), 'default')]",
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageName'))]"
+            ],
+            "properties": {
+                "publicAccess": "None"
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/fileServices/shares",
+            "apiVersion": "2019-06-01",
+            "name": "[concat(variables('storageName'), '/default/device-shipment-files')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/fileServices', variables('storageName'), 'default')]",
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageName'))]"
+            ],
+            "properties": {
+                "shareQuota": 5120
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/fileServices/shares",
+            "apiVersion": "2019-06-01",
+            "name": "[concat(variables('storageName'), '/default/deviceshipmentsa9b6')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/fileServices', variables('storageName'), 'default')]",
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageName'))]"
+            ],
+            "properties": {
+                "shareQuota": 5120
+            }
+        },
+        {
+            "type": "Microsoft.Web/serverfarms",
+            "apiVersion": "2018-02-01",
+            "name": "[variables('serverFarmName')]",
+            "location": "Central US",
+            "sku": {
+                "name": "Y1",
+                "tier": "Dynamic",
+                "size": "Y1",
+                "family": "Y",
+                "capacity": 0
+            },
+            "kind": "functionapp",
+            "properties": {
+                "perSiteScaling": false,
+                "maximumElasticWorkerCount": 1,
+                "isSpot": false,
+                "reserved": false,
+                "isXenon": false,
+                "hyperV": false,
+                "targetWorkerCount": 0,
+                "targetWorkerSizeId": 0
+            }
         },
         {
             "type": "Microsoft.Web/sites",
@@ -123,7 +173,7 @@
             "name": "[variables('appName')]",
             "location": "Central US",
             "dependsOn": [
-                "[resourceId('Microsoft.Web/serverfarms', 'ASP-rgDeviceShipments-b67a')]"
+                "[resourceId('Microsoft.Web/serverfarms', variables('serverFarmName'))]"
             ],
             "kind": "functionapp",
             "properties": {
@@ -140,7 +190,7 @@
                         "hostType": "Repository"
                     }
                 ],
-                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', 'ASP-rgDeviceShipments-b67a')]",
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('serverFarmName'))]",
                 "reserved": false,
                 "isXenon": false,
                 "hyperV": false,
@@ -151,7 +201,19 @@
                 "containerSize": 1536,
                 "dailyMemoryTimeQuota": 0,
                 "httpsOnly": false,
-                "redundancyMode": "None"
+                "redundancyMode": "None",
+                "siteConfig": {
+                "appSettings": [
+                    {
+                    "name": "device-shipments-TopicURI",
+                    "value": "[reference(variables('eventgridTopic')).endpointUrl]"
+                    },
+                    {
+                    "name": "device-shipments-TopicKEY",
+                    "value": "[listKeys(variables('eventgridTopic'),'2020-04-01-preview').key1]"
+                    }
+                    ]
+                }
             }
         },
         {
@@ -279,54 +341,6 @@
                 "hostNameType": "Verified"
             }
         },
-        {
-            "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
-            "apiVersion": "2019-06-01",
-            "name": "[concat(variables('storageName'), '/default/azure-webjobs-hosts')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', variables('storageName'), 'default')]",
-                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageName'))]"
-            ],
-            "properties": {
-                "publicAccess": "None"
-            }
-        },
-        {
-            "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
-            "apiVersion": "2019-06-01",
-            "name": "[concat(variables('storageName'), '/default/azure-webjobs-secrets')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', variables('storageName'), 'default')]",
-                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageName'))]"
-            ],
-            "properties": {
-                "publicAccess": "None"
-            }
-        },
-        {
-            "type": "Microsoft.Storage/storageAccounts/fileServices/shares",
-            "apiVersion": "2019-06-01",
-            "name": "[concat(variables('storageName'), '/default/device-shipment-files')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Storage/storageAccounts/fileServices', variables('storageName'), 'default')]",
-                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageName'))]"
-            ],
-            "properties": {
-                "shareQuota": 5120
-            }
-        },
-        {
-            "type": "Microsoft.Storage/storageAccounts/fileServices/shares",
-            "apiVersion": "2019-06-01",
-            "name": "[concat(variables('storageName'), '/default/deviceshipmentsa9b6')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Storage/storageAccounts/fileServices', variables('storageName'), 'default')]",
-                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageName'))]"
-            ],
-            "properties": {
-                "shareQuota": 5120
-            }
-        },
 {
     "type": "Microsoft.Web/connections",
     "apiVersion": "2016-06-01",
@@ -336,7 +350,7 @@
         "displayName": "ddials@microsoft.com",
         "customParameterValues": {},
         "api": {
-            "id": "/subscriptions/7bc9da69-3220-4f6a-8cfd-f05fc5a64aa9/providers/Microsoft.Web/locations/centralus/managedApis/azureeventgrid"
+            "id": "[concat('/subscriptions/', subscription().id, '/providers/Microsoft.Web/locations/centralus/managedApis/azureeventgrid')]"
         }
     }
 },
@@ -349,7 +363,7 @@
         "displayName": "EventGridPublish",
         "customParameterValues": {},
         "api": {
-            "id": "/subscriptions/7bc9da69-3220-4f6a-8cfd-f05fc5a64aa9/providers/Microsoft.Web/locations/centralus/managedApis/azureeventgridpublish"
+            "id": "[concat('/subscriptions/', subscription().id, '/providers/Microsoft.Web/locations/centralus/managedApis/azureeventgridpublish')]"
         }
     }
 },
@@ -362,7 +376,7 @@
         "displayName": "AzureFileStore",
         "customParameterValues": {},
         "api": {
-            "id": "/subscriptions/7bc9da69-3220-4f6a-8cfd-f05fc5a64aa9/providers/Microsoft.Web/locations/centralus/managedApis/azurefile"
+            "id": "[concat('/subscriptions/', subscription().id, '/providers/Microsoft.Web/locations/centralus/managedApis/azurefile')]"
         }
     }
 },
@@ -375,7 +389,7 @@
         "displayName": "ddials@microsoft.com",
         "customParameterValues": {},
         "api": {
-            "id": "/subscriptions/7bc9da69-3220-4f6a-8cfd-f05fc5a64aa9/providers/Microsoft.Web/locations/centralus/managedApis/sharepointonline"
+            "id": "[concat('/subscriptions/', subscription().id, '/providers/Microsoft.Web/locations/centralus/managedApis/sharepointonline')]"
         }
     }
 },
@@ -385,11 +399,9 @@
             "name": "logic-device-shipments",
             "location": "centralus",
             "dependsOn": [
-
-
-"[resourceId('Microsoft.Web/connections', 'azureeventgridpublish')]",
-"[resourceId('Microsoft.Web/connections', 'azurefile')]",
-"[resourceId('Microsoft.Web/connections', 'sharepointonline')]"
+                "[resourceId('Microsoft.Web/connections', 'azureeventgridpublish')]",
+                "[resourceId('Microsoft.Web/connections', 'azurefile')]",
+                "[resourceId('Microsoft.Web/connections', 'sharepointonline')]"
             ],
             "properties": {
                 "state": "Enabled",
@@ -599,17 +611,17 @@
                             "azureeventgridpublish": {
                                 "connectionId": "[resourceId('Microsoft.Web/connections', 'azureeventgridpublish')]",
                                 "connectionName": "azureeventgridpublish",
-                                "id": "/subscriptions/7bc9da69-3220-4f6a-8cfd-f05fc5a64aa9/providers/Microsoft.Web/locations/centralus/managedApis/azureeventgridpublish"
+                                "id": "[concat('/subscriptions/', subscription().id, '/providers/Microsoft.Web/locations/centralus/managedApis/azureeventgridpublish')]"
                             },
                             "azurefile": {
                                 "connectionId": "[resourceId('Microsoft.Web/connections', 'azurefile')]",
                                 "connectionName": "azurefile",
-                                "id": "/subscriptions/7bc9da69-3220-4f6a-8cfd-f05fc5a64aa9/providers/Microsoft.Web/locations/centralus/managedApis/azurefile"
+                                "id": "[concat('/subscriptions/', subscription().id, '/providers/Microsoft.Web/locations/centralus/managedApis/azurefile')]"
                             },
                             "sharepointonline": {
                                 "connectionId": "[resourceId('Microsoft.Web/connections', 'sharepointonline')]",
                                 "connectionName": "sharepointonline",
-                                "id": "/subscriptions/7bc9da69-3220-4f6a-8cfd-f05fc5a64aa9/providers/Microsoft.Web/locations/centralus/managedApis/sharepointonline"
+                                "id": "[concat('/subscriptions/', subscription().id, '/providers/Microsoft.Web/locations/centralus/managedApis/sharepointonline')]"
                             }
                         }
                     }
@@ -637,7 +649,7 @@
                             "type": "Object"
                         },
                         "Subscription ID": {
-                            "defaultValue": "7bc9da69-3220-4f6a-8cfd-f05fc5a64aa9",
+                            "defaultValue": "[subscription().id]",
                             "type": "String"
                         }
                     },
@@ -662,7 +674,7 @@
                                         "name": "@parameters('$connections')['azureeventgrid']['connectionId']"
                                     }
                                 },
-                                "path": "/subscriptions/@{encodeURIComponent('7bc9da69-3220-4f6a-8cfd-f05fc5a64aa9')}/providers/@{encodeURIComponent('Microsoft.EventGrid.Topics')}/resource/eventSubscriptions",
+                                "path": "[concat('/subscriptions/@{encodeURIComponent(''', subscription().id, ''')}/providers/@{encodeURIComponent(''Microsoft.EventGrid.Topics'')}/resource/eventSubscriptions')]",
                                 "queries": {
                                     "x-ms-api-version": "2017-09-15-preview"
                                 }
@@ -720,12 +732,12 @@
                             "azureeventgrid": {
                                 "connectionId": "[resourceId('Microsoft.Web/connections', 'azureeventgrid')]",
                                 "connectionName": "azureeventgrid",
-                                "id": "/subscriptions/7bc9da69-3220-4f6a-8cfd-f05fc5a64aa9/providers/Microsoft.Web/locations/centralus/managedApis/azureeventgrid"
+                                "id": "[concat('/subscriptions/', subscription().id, '/providers/Microsoft.Web/locations/centralus/managedApis/azureeventgrid')]"
                             },
                             "sharepointonline_1": {
                                 "connectionId": "[resourceId('Microsoft.Web/connections', 'sharepointonline')]",
                                 "connectionName": "sharepointonline",
-                                "id": "/subscriptions/7bc9da69-3220-4f6a-8cfd-f05fc5a64aa9/providers/Microsoft.Web/locations/centralus/managedApis/sharepointonline"
+                                "id": "[concat('/subscriptions/', subscription().id, '/providers/Microsoft.Web/locations/centralus/managedApis/sharepointonline')]"
                             }
                         }
                     }
