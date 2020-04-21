@@ -363,7 +363,7 @@
         "displayName": "EventGridPublish",
         "customParameterValues": {},
         "api": {
-            "id": "[concat('/subscriptions/', subscription().id, '/providers/Microsoft.Web/locations/centralus/managedApis/azureeventgridpublish')]"
+            "id": "[concat(subscription().id, '/providers/Microsoft.Web/locations/centralus/managedApis/azureeventgridpublish')]"
         }
     }
 },
@@ -376,7 +376,7 @@
         "displayName": "AzureFileStore",
         "customParameterValues": {},
         "api": {
-            "id": "[concat('/subscriptions/', subscription().id, '/providers/Microsoft.Web/locations/centralus/managedApis/azurefile')]"
+            "id": "[concat(subscription().id, '/providers/Microsoft.Web/locations/centralus/managedApis/azurefile')]"
         }
     }
 },
@@ -389,7 +389,7 @@
         "displayName": "ddials@microsoft.com",
         "customParameterValues": {},
         "api": {
-            "id": "[concat('/subscriptions/', subscription().id, '/providers/Microsoft.Web/locations/centralus/managedApis/sharepointonline')]"
+            "id": "[concat(subscription().id, '/providers/Microsoft.Web/locations/centralus/managedApis/sharepointonline')]"
         }
     }
 },
