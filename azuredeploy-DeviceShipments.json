@@ -206,7 +206,7 @@
                 "appSettings": [
                     {
                     "name": "device-shipments-TopicURI",
-                    "value": "[reference(variables('eventgridTopic')).endpointUrl]"
+                    "value": "[reference(variables('eventgridTopic')).endpoint]"
                     },
                     {
                     "name": "device-shipments-TopicKEY",
