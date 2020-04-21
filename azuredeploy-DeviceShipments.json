@@ -636,8 +636,8 @@
             "location": "centralus",
             "dependsOn": [
 "[resourceId('Microsoft.EventGrid/topics', variables('eventgridTopic'))]",
-"[resourceId('Microsoft.Web/connections', 'azureeventgrid')]",
-"[resourceId('Microsoft.Web/connections', 'sharepointonline')]"
+"[resourceId('Microsoft.Web/connections', 'sharepointonline')]",
+"[resourceId('Microsoft.Web/connections', 'azureeventgrid')]"
             ],
             "properties": {
                 "state": "Enabled",
