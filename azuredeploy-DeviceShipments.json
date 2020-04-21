@@ -350,7 +350,7 @@
         "displayName": "ddials@microsoft.com",
         "customParameterValues": {},
         "api": {
-            "id": "[concat('/subscriptions/', subscription().id, '/providers/Microsoft.Web/locations/centralus/managedApis/azureeventgrid')]"
+            "id": "[concat(subscription().id, '/providers/Microsoft.Web/locations/centralus/managedApis/azureeventgrid')]"
         }
     }
 },
