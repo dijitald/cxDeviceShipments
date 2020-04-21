@@ -733,12 +733,12 @@
                             "azureeventgrid": {
                                 "connectionId": "[resourceId('Microsoft.Web/connections', 'azureeventgrid')]",
                                 "connectionName": "azureeventgrid",
-                                "id": "[concat('/subscriptions/', subscription().id, '/providers/Microsoft.Web/locations/centralus/managedApis/azureeventgrid')]"
+                                "id": "[concat(subscription().id, '/providers/Microsoft.Web/locations/centralus/managedApis/azureeventgrid')]"
                             },
                             "sharepointonline_1": {
                                 "connectionId": "[resourceId('Microsoft.Web/connections', 'sharepointonline')]",
                                 "connectionName": "sharepointonline",
-                                "id": "[concat('/subscriptions/', subscription().id, '/providers/Microsoft.Web/locations/centralus/managedApis/sharepointonline')]"
+                                "id": "[concat(subscription().id, '/providers/Microsoft.Web/locations/centralus/managedApis/sharepointonline')]"
                             }
                         }
                     }
