@@ -8,7 +8,7 @@
         "eventgridTopic" : "[toLower(concat('topic-event-grid-', uniqueString(resourceGroup().id) ) )]",
         "serverFarmName" : "[concat('ASP-', resourceGroup().name, '-', uniqueString(resourceGroup().id))]",
         "sourceCodeRepositoryURL" : "https://github.com/dijitald/cxDeviceShipments.git",
-        "sourceCodeBranch" : "main"
+        "sourceCodeBranch" : "master"
     },
     "resources": [
         {
