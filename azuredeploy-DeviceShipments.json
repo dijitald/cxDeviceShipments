@@ -257,15 +257,39 @@
                 "redundancyMode": "None",
                 "siteConfig": {
                 "appSettings": [
-                    {
+                {
+                    "name": "AzureWebJobsDashboard",
+                    "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageName'), ';AccountKey=', listKeys(variables('storageName'),'2015-05-01-preview').key1)]"
+                },
+                {
+                    "name": "AzureWebJobsStorage",
+                    "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageName'), ';AccountKey=', listKeys(variables('storageName'),'2015-05-01-preview').key1)]"
+                },
+                {
+                    "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
+                    "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageName'), ';AccountKey=', listKeys(variables('storageName'),'2015-05-01-preview').key1)]"
+                },
+                {
+                    "name": "WEBSITE_CONTENTSHARE",
+                    "value": "[variables('appName')]"
+                },
+                {
+                    "name": "FUNCTIONS_EXTENSION_VERSION",
+                    "value": "~2"
+                },
+                {
+                    "name": "FUNCTIONS_WORKER_RUNTIME",
+                    "value": "dotnet"
+                },
+                {
                     "name": "device-shipments-TopicURI",
                     "value": "[reference(variables('eventgridTopic')).endpoint]"
-                    },
-                    {
+                },
+                {
                     "name": "device-shipments-TopicKEY",
                     "value": "[listKeys(variables('eventgridTopic'),'2020-04-01-preview').key1]"
-                    }
-                    ]
+                }
+                ]
                 }
             },
             "resources" : [
