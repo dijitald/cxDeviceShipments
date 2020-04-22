@@ -258,16 +258,16 @@
                 "siteConfig": {
                 "appSettings": [
                     {
-                        "name": "AzureWebJobsDashboard",
-                        "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageName'), ';AccountKey=', listKeys(variables('storageName'),'2015-05-01-preview').key1)]"
-                    },
-                    {
                         "name": "AzureWebJobsStorage",
                         "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageName'), ';AccountKey=', listKeys(variables('storageName'),'2015-05-01-preview').key1)]"
                     },
                     {
                         "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
                         "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageName'), ';AccountKey=', listKeys(variables('storageName'),'2015-05-01-preview').key1)]"
+                    },
+                    {
+                        "name": "WEBSITE_CONTENTSHARE",
+                        "value": "[variables('storageName')]"
                     },
                     {
                         "name": "device-shipments-TopicURI",
@@ -279,7 +279,22 @@
                     }
                 ]
                 }
+            },
+            "resources" : [
+            {
+                "apiVersion": "2015-08-01",
+                "name": "sccFunction",
+                "type": "sourcecontrols",
+                "dependsOn": [
+                    "[resourceId('Microsoft.Web/sites/', variables('appName'))]"
+                ],
+                "properties": {
+                    "RepoUrl": "[variables('sourceCodeRepositoryURL')]",
+                    "branch": "[variables('sourceCodeBranch')]",
+                    "IsManualIntegration": true
+                }
             }
+            ]
         },
         {
             "type": "Microsoft.Web/sites/config",
