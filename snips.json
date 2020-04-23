@@ -21,23 +21,6 @@
                     }
                 },
                 {
-                    "type": "Microsoft.Storage/storageAccounts/fileServices",
-                    "apiVersion": "2019-06-01",
-                    "name": "[concat(variables('storageName'),'/default')]",
-                    "dependsOn": [
-                        "[resourceId('Microsoft.Storage/storageAccounts', variables('storageName'))]"
-                    ],
-                    "sku": {
-                        "name": "Standard_LRS",
-                        "tier": "Standard"
-                    },
-                    "properties": {
-                        "cors": {
-                            "corsRules": []
-                        }
-                    }
-                }, 
-                {
                     "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
                     "apiVersion": "2019-06-01",
                     "name": "[concat(variables('storageName'), '/default/azure-webjobs-hosts')]",
